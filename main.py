@@ -262,5 +262,41 @@ def _print_stats(stats: dict, label: str) -> None:
     console.print(table)
 
 
+
+@cli.command("bronze-zip")
+@click.argument("kanton")
+@click.option("--dry-run", is_flag=True, default=False)
+def bronze_zip(kanton: str, dry_run: bool):
+    """ZIP-Vollabzug fuer einen Kanton. KANTON: z.B. ag, zh oder all."""
+    from src.ingestion.gwr_zip_fetcher import GWRZipFetcher
+    from src.pipeline.bronze import _ensure_bronze_table, _write_batch, BATCH_SIZE
+    from src.utils.databricks_client import get_client
+    import uuid
+    from datetime import datetime, timezone
+    fetcher = GWRZipFetcher()
+    client = get_client() if not dry_run else None
+    run_id = str(uuid.uuid4())[:8]
+    now = datetime.now(timezone.utc)
+    console.print(Panel(f"[bold]Bronze ZIP[/bold] | Kanton: {kanton.upper()} | run_id: {run_id}", style="yellow"))
+    if not dry_run:
+        client.ensure_schema()
+        _ensure_bronze_table(client)
+    iterator = fetcher.fetch_kanton(kanton) if kanton.lower() != "all" else fetcher.fetch_all()
+    buf, total = [], 0
+    for record in iterator:
+        record.update({"_ingested_at": now.isoformat(), "_ingestion_date": now.date().isoformat(),
+                       "_run_id": run_id, "_batch_id": f"{run_id}_{total//BATCH_SIZE:04d}",
+                       "_source": "gwr_zip", "_is_full_load": True})
+        buf.append(record)
+        if len(buf) >= BATCH_SIZE:
+            if not dry_run: _write_batch(client, buf)
+            total += len(buf)
+            console.print(f"  {total:,} Records...")
+            buf = []
+    if buf:
+        if not dry_run: _write_batch(client, buf)
+        total += len(buf)
+    console.print(f"\n[bold green]Fertig: {total:,} Records[/bold green]")
+
 if __name__ == "__main__":
     cli()
