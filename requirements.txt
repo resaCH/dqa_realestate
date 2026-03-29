@@ -1,0 +1,35 @@
+# Databricks
+databricks-sdk>=0.20.0
+databricks-connect>=14.0.0
+
+# Data processing
+pandas>=2.1.0
+pyarrow>=14.0.0
+delta-spark>=3.0.0
+
+# HTTP / API
+requests>=2.31.0
+tenacity>=8.2.0
+
+# Data quality
+great-expectations>=0.18.0
+
+# Config / env
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# Utils
+loguru>=0.7.2
+click>=8.1.7
+rich>=13.7.0
+tqdm>=4.66.0
+
+# Dev / testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+responses>=0.24.0
+pre-commit>=3.5.0
+black>=23.12.0
+isort>=5.13.0
+ruff>=0.1.9
