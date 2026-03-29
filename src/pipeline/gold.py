@@ -37,7 +37,7 @@ VIEWS = {
                 WHEN 1003 THEN 'Im Bau'
                 WHEN 1004 THEN 'Bestehend'
                 WHEN 1006 THEN 'Nicht nutzbar'
-                WHEN 1007 Abgebrochen'
+                WHEN 1007 THEN 'Abgebrochen'
                 WHEN 8 THEN 'Nicht realisiert'
                 ELSE    'Unbekannt'
             END                         AS gstat_label,
