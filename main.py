@@ -298,5 +298,14 @@ def bronze_zip(kanton: str, dry_run: bool):
         total += len(buf)
     console.print(f"\n[bold green]Fertig: {total:,} Records[/bold green]")
 
+@cli.command("bronze-bulk")
+@click.argument("kanton")
+def bronze_bulk(kanton: str):
+    """Schnelle Bulk-Ingestion via DBFS + COPY INTO. KANTON: z.B. ch, ag, zh"""
+    from src.pipeline.bronze_bulk import run_bulk_ingestion
+    console.print(Panel(f"[bold]Bronze Bulk[/bold] | Kanton: {kanton.upper()}", style="yellow"))
+    stats = run_bulk_ingestion(kanton)
+    _print_stats(stats, "Bulk Ingestion")
+
 if __name__ == "__main__":
     cli()
